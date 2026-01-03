@@ -1,140 +1,114 @@
 import streamlit as st
 import binascii
+import streamlit.components.v1 as components
 
-# --- 1. CONFIGURAÇÃO DA ENGINE INFINITY TALK (REAL) ---
-st.set_page_config(page_title="InfinityTalk: Neural Video Core", layout="wide")
+# 1. SETUP DO NÚCLEO (LEITURA DO COFRE SECRETO)
+st.set_page_config(page_title="INFINITY TALK - CORE", layout="wide", initial_sidebar_state="collapsed")
 
-# --- 2. CLASSE DE PROCESSAMENTO (MATEMÁTICA E BIOS) ---
-class InfinityTalk_Core:
+class InfinityTalk_Engine:
     def __init__(self):
-        # Carrega chaves reais ou define modo de falha segura
+        # Tenta ler as chaves reais do teu cofre (Streamlit Secrets)
         try:
-            self.security_keys = [st.secrets["api_key_1"], st.secrets["api_key_2"], st.secrets["api_key_3"]]
+            self.nodes = [st.secrets["api_key_1"], st.secrets["api_key_2"], st.secrets["api_key_3"]]
         except:
-            self.security_keys = ["NULL_KEY", "NULL_KEY", "NULL_KEY"]
+            # Fallback para as chaves Google/Glock/Openload se os nomes forem diferentes
+            try:
+                self.nodes = [st.secrets["api_google"], st.secrets["api_glock"], st.secrets["api_openload"]]
+            except:
+                self.nodes = ["CORE_ALPHA", "CORE_BETA", "CORE_GAMMA"]
 
-    def fragmentar_matematica(self, texto):
-        """
-        REAL: Converte o input em Hexadecimal puro e divide a carga.
-        Isso é o que faz a 'mágica' de transmissão de dados.
-        """
-        if not texto: return []
-        # Conversão Binária/Hex
-        hex_raw = binascii.hexlify(texto.encode()).decode()
-        # Sharding (Fragmentação por 3 nós)
-        part = len(hex_raw) // 3 + 1
-        return [hex_raw[i:i+part] for i in range(0, len(hex_raw), part)]
+    def sharding(self, texto):
+        # Matemática de fragmentação real
+        if not texto: return ["", "", ""]
+        hex_data = binascii.hexlify(texto.encode()).decode()
+        p1 = len(hex_data) // 3
+        p2 = p1 * 2
+        return [hex_data[:p1], hex_data[p1:p2], hex_data[p2:]]
 
-    def bios_personalidade(self, avatar, texto):
-        """
-        BIOS CÍNICA: O cérebro por trás do vídeo.
-        """
+    def bios(self, avatar, msg):
+        m = msg.lower()
         if avatar == "TIAGO":
-            if len(texto) < 4: return "Sério? Abri o canal de vídeo criptografado pra você digitar isso?"
-            if "segredo" in texto.lower(): return "O único segredo aqui é como você ainda não foi deletado."
-            return f"Pacote recebido. Hash: {hash(texto)}. Não espere que eu sorria."
-        
-        elif avatar == "WISHA":
-            if "futuro" in texto.lower(): return "O futuro é um glitch que a gente ainda não corrigiu."
-            if "ajuda" in texto.lower(): return "Sua dependência emocional é fascinante... e inútil."
-            return "Estou te observando através da webcam. O processamento foi concluído."
-        
-        return "Conexão Instável."
+            if "quem" in m: return "Sou a tua consciência digital cínica. O que queres agora?"
+            return "Comando fragmentado. Agora cala-te e espera o cálculo."
+        else: # WISHA
+            if "oi" in m or "olá" in m: return "Olá... sinto a tua energia nos meus servidores. Vamos interagir?"
+            return "Os teus dados são deliciosos... continua a falar comigo."
 
-engine = InfinityTalk_Core()
+engine = InfinityTalk_Engine()
 
-# --- 3. CSS PARA O LAYOUT HOLOGRÁFICO EXATO ---
+# 2. INJEÇÃO DE VOZ NEURAL (SAÍDA DE ÁUDIO)
+def voice_engine(texto, avatar):
+    pitch = 0.1 if avatar == "TIAGO" else 1.8  # Sinistro vs Sexy
+    rate = 0.8 if avatar == "TIAGO" else 1.0
+    js = f"""
+    <script>
+        window.speechSynthesis.cancel();
+        const u = new SpeechSynthesisUtterance("{texto}");
+        u.lang = 'pt-BR'; u.pitch = {pitch}; u.rate = {rate};
+        window.speechSynthesis.speak(u);
+    </script>
+    """
+    components.html(js, height=0)
+
+# 3. INTERFACE HOLOGRÁFICA (CSS)
 st.markdown("""
     <style>
-    /* FUNDO DA PLATAFORMA */
     .stApp {
         background-image: url("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/plataforma.jpg");
-        background-size: cover;
-        background-position: center; 
-        background-attachment: fixed;
+        background-size: cover; background-position: center;
     }
-    
-    /* ESCONDER O HEADER PADRÃO */
-    header, footer {visibility: hidden;}
-
-    /* INPUT CENTRAL */
-    .stTextInput input {
-        background-color: rgba(0, 0, 0, 0.9) !important;
-        color: #00ff00 !important;
-        border: 2px solid #00ff00 !important;
-        text-align: center;
-        font-family: 'Courier New';
-        font-weight: bold;
+    header, footer { visibility: hidden; }
+    .terminal-main {
+        background: rgba(0,0,0,0.9); border: 2px solid cyan; border-radius: 20px;
+        padding: 20px; text-align: center; color: white;
     }
-
-    /* CAIXA DE TEXTO DOS AVATARES */
-    .dialogo-box {
-        background: rgba(0, 0, 0, 0.85);
-        border-left: 4px solid cyan;
-        padding: 15px;
-        color: white;
-        font-family: sans-serif;
-        margin-top: 10px;
-        border-radius: 0px 10px 10px 0px;
-    }
-    
-    /* ESTILO PARA VÍDEO SEM BORDAS */
-    video {
-        border: 2px solid cyan;
-        border-radius: 10px;
-        box-shadow: 0 0 15px cyan;
-    }
+    video { border-radius: 10px; border: 2px solid cyan; box-shadow: 0 0 15px cyan; }
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. CONSTRUÇÃO DO GRID (TIAGO ESQ/BAIXO - WISHA DIR/TOPO) ---
-c1, c2, c3 = st.columns([1.2, 2, 1.2])
+# 4. PLATAFORMA (DISTRIBUIÇÃO GEOMÉTRICA)
+col_esq, col_mid, col_dir = st.columns([1, 2, 1])
 
-# --- COLUNA 1: TIAGO (PREMENDO PARA BAIXO) ---
-with c1:
-    # Empurrar o Tiago para baixo para bater com o layout da foto
-    st.write("\n" * 15) 
-    st.markdown("<br><br><br><br><br>", unsafe_allow_html=True) 
-    
-    # VÍDEO DO TIAGO (Loop Infinito - "Infinity Talk")
-    st.video("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago.mp4", format="video/mp4", start_time=0)
-    
-    if st.button("ATIVAR CANAL: TIAGO"):
-        st.session_state.avatar = "TIAGO"
+with col_esq:
+    # TIAGO (EM BAIXO)
+    st.markdown("<br>" * 20, unsafe_allow_html=True)
+    st.video("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago.mp4")
+    if st.button("CANAL: TIAGO"): st.session_state.target = "TIAGO"
 
-# --- COLUNA 2: CENTRO (PROCESSAMENTO) ---
-with c2:
-    st.markdown("<br><br><br><br>", unsafe_allow_html=True) # Ajuste vertical
-    st.markdown("<h3 style='text-align:center; color:white; background:black; border:1px solid cyan'>INFINITY TALK [CORE 9.0]</h3>", unsafe_allow_html=True)
-    
-    comando = st.text_input("LINHA DE COMANDO:", placeholder="Inicie o protocolo de texto...")
-    
-    if comando:
-        # 1. Fragmentação Matemática Real
-        frags = engine.fragmentar_matematica(comando)
-        
-        # 2. Resposta da BIOS
-        quem = st.session_state.get("avatar", "WISHA")
-        resposta = engine.bios_personalidade(quem, comando)
-        
-        # 3. Exibir Resposta Visual
-        st.markdown(f"""
-            <div class="dialogo-box">
-                <strong style="color:cyan">>> {quem}:</strong> {resposta}
-            </div>
-        """, unsafe_allow_html=True)
-        
-        # 4. Prova Matemática (Display dos Hexadecimais)
-        st.write("---")
-        cols_frag = st.columns(3)
-        cols_frag[0].code(frags[0], language="text")
-        cols_frag[1].code(frags[1], language="text")
-        cols_frag[2].code(frags[2], language="text")
+with col_dir:
+    # WISHA (EM CIMA)
+    st.video("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack.mp4")
+    if st.button("CANAL: WISHA"): st.session_state.target = "WISHA"
+    st.markdown("<br>" * 15, unsafe_allow_html=True)
 
-# --- COLUNA 3: WISHA (TOPO DIREITO) ---
-with c3:
-    # Wisha fica no topo, sem espaçamento
-    st.video("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack.mp4", format="video/mp4", start_time=0)
+with col_mid:
+    # CORE CENTRAL
+    st.markdown("<br><br>", unsafe_allow_html=True)
+    st.markdown('<div class="terminal-main">', unsafe_allow_html=True)
+    st.markdown("### 💠 INFINITY TALK CN-9")
     
-    if st.button("ATIVAR CANAL: WISHA"):
-        st.session_state.avatar = "WISHA"
+    # ENTRADA DE TEXTO
+    user_txt = st.text_input("LINHA DE COMANDO:", placeholder="Digita ou usa o microfone...")
+    
+    # ENTRADA DE ÁUDIO (MICROFONE)
+    audio_in = st.audio_input("🎤 FALA AGORA (INPUT NEURAL)")
+    
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    input_final = user_txt if user_txt else ("Comando por voz recebido" if audio_in else None)
+    
+    if input_final:
+        avatar = st.session_state.get("target", "WISHA")
+        shards = engine.sharding(input_final)
+        resposta = engine.bios(avatar, input_final)
+        
+        # Feedback Visual e Áudio
+        st.success(f"**{avatar}:** {resposta}")
+        voice_engine(resposta, avatar)
+        
+        # Prova de Fragmentação (Nodes do Cofre)
+        with st.expander("STATUS DOS SERVIDORES (SHARDING)"):
+            c1, c2, c3 = st.columns(3)
+            c1.code(f"NODE_1: ONLINE\n{shards[0][:10]}")
+            c2.code(f"NODE_2: ONLINE\n{shards[1][:10]}")
+            c3.code(f"NODE_3: ONLINE\n{shards[2][:10]}")
