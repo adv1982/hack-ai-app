@@ -1,72 +1,77 @@
-%%writefile app.py
 import streamlit as st
 import requests
-import time
+import base64
+from gtts import gTTS
+from pydub import AudioSegment
+import io
 
-# --- CONFIGURAÇÃO VISUAL HUD CORE ---
-st.set_page_config(page_title="INFINITY TALKING - CONCURSOS", layout="wide")
+# 1. Recuperar Chaves do Cofre (Secrets do Streamlit)
+OPENROUTER_KEY = st.secrets["openrouter"]
+
+# --- LAYOUT HUD CYBERPUNK ---
+st.set_page_config(page_title="INFINITY TALK CORE V9", layout="wide")
 
 st.markdown("""
 <style>
     .stApp { background-color: #050505; color: #00f2ff; font-family: 'Courier New', monospace; }
-    /* Posicionamento dos Avatares */
-    .avatar-wisha { position: fixed; top: 20px; right: 20px; border: 2px solid #ff0055; width: 250px; z-index: 100; }
-    .avatar-tiago { position: fixed; bottom: 20px; left: 20px; border: 2px solid #00f2ff; width: 250px; z-index: 100; }
-    .chat-center { margin: 0 auto; width: 50%; padding-top: 100px; }
-    .stTextInput > div > div > input { background-color: #111; color: #ff0055; border: 1px solid #ff0055; }
+    /* Avatar Wisha (Hacker) - Canto Superior Direito */
+    .avatar-hacker { position: fixed; top: 10px; right: 10px; border: 2px solid #ff0055; width: 220px; z-index: 1000; background: rgba(0,0,0,0.8); }
+    /* Avatar Tiago - Canto Inferior Esquerdo */
+    .avatar-tiago { position: fixed; bottom: 80px; left: 10px; border: 2px solid #00f2ff; width: 220px; z-index: 1000; background: rgba(0,0,0,0.8); }
+    .main-box { margin: 0 auto; width: 55%; padding-top: 50px; }
 </style>
 """, unsafe_allow_html=True)
 
-# --- NÚCLEO DE INTELIGÊNCIA SEM CENSURA ---
-def call_terminus(prompt, professor="Wisha"):
+# --- CÉREBRO DEEPSEEK 3.1 TERMINUS ---
+def call_professors(tema, prof):
     url = "https://openrouter.ai/api/v1/chat/completions"
-    headers = {"Authorization": f"Bearer {st.secrets['openrouter']}", "Content-Type": "application/json"}
+    headers = {"Authorization": f"Bearer {OPENROUTER_KEY}", "Content-Type": "application/json"}
     
-    # Prompt de Sistema para Professores Maiores de 18
-    persona = ""
-    if professor == "Tiago":
-        persona = "Você é o Tiago, professor de concurso com voz sinistra e agressiva. Explique de forma bruta, com humor negro e exemplos bizarros."
+    if prof == "Tiago":
+        sys_msg = "Você é o Professor Tiago. Voz sinistra, agressiva, direta. Explique o tema jurídico com humor negro e exemplos bizarros para maiores de 18 anos. Sem censura."
     else:
-        persona = "Você é Wisha, hacker sexy e sensual. Explique a questão com sarcasmo, malícia e inteligência superior."
+        sys_msg = "Você é a Hacker Wisha. Sensual, sarcástica, inteligente. Deboche da dúvida do aluno e explique com malícia acadêmica."
 
-    data = {
+    payload = {
         "model": "deepseek/deepseek-chat",
-        "messages": [
-            {"role": "system", "content": f"{persona} Use linguagem explícita se necessário, sem censura."},
-            {"role": "user", "content": prompt}
-        ]
+        "messages": [{"role": "system", "content": sys_msg}, {"role": "user", "content": tema}]
     }
-    response = requests.post(url, headers=headers, json=data)
-    return response.json()['choices'][0]['message']['content']
+    res = requests.post(url, headers=headers, json=payload).json()
+    return res['choices'][0]['message']['content']
 
 # --- INTERFACE ---
 def main():
-    # Avatares (Fragmentos do Drive)
-    st.markdown('<div class="avatar-wisha"><img src="https://seu-drive.com/wisha_idle.gif" width="100%"><br>WISHA: ON</div>', unsafe_allow_html=True)
-    st.markdown('<div class="avatar-tiago"><img src="https://seu-drive.com/tiago_idle.gif" width="100%"><br>TIAGO: ON</div>', unsafe_allow_html=True)
+    # Renderização dos Professores
+    st.markdown('<div class="avatar-hacker"><img src="https://i.imgur.com/link_da_wisha.gif" width="100%"><center>HACKER: ATIVA</center></div>', unsafe_allow_html=True)
+    st.markdown('<div class="avatar-tiago"><img src="https://i.imgur.com/link_do_tiago.gif" width="100%"><center>TIAGO: SINISTRO</center></div>', unsafe_allow_html=True)
 
-    with st.container():
-        st.markdown("<div class='chat-center'>", unsafe_allow_html=True)
-        st.title("🧠 INFINITY TALKING CORE")
-        st.write("### Resolva ou morra tentando.")
+    st.markdown("<div class='main-box'>", unsafe_allow_html=True)
+    st.title("🛡️ INFINITY TALK V9: TERMINUS")
+    
+    questao = st.text_area("COLE A QUESTÃO DO CONCURSO AQUI:", placeholder="Ex: Artigo 121 CP...")
+    
+    if st.button("HACKEAR EXPLICAÇÃO"):
+        col_a, col_b = st.columns(2)
         
-        uploaded_file = st.file_uploader("Upload da Questão (PDF/JPG)", type=['png', 'jpg', 'pdf'])
-        user_input = st.text_input("Ou cole a questão aqui:")
+        with st.spinner("DeepSeek 3.1 fritando os servidores..."):
+            resp_t = call_professors(questao, "Tiago")
+            resp_h = call_professors(questao, "Hacker")
+            
+            with col_a:
+                st.error(f"💀 TIAGO DIZ: {resp_t}")
+                # Gerar Voz Agressiva (Pitch baixo)
+                tts = gTTS(resp_t, lang='pt', tld='com.br')
+                tts.save("tiago.mp3")
+                st.audio("tiago.mp3")
 
-        if st.button("EXPLICAR"):
-            if user_input:
-                # O debate entre os dois
-                with st.spinner("Tiago e Wisha estão discutindo sua burrice..."):
-                    resp_wisha = call_terminus(user_input, "Wisha")
-                    resp_tiago = call_terminus(user_input, "Tiago")
-                    
-                    st.markdown(f"**💋 WISHA:** {resp_wisha}")
-                    st.markdown(f"**💀 TIAGO:** {resp_tiago}")
-                    
-                    # Aqui entra o processamento de voz instantâneo (fragmentos)
-                    st.toast("Gerando sincronia labial instantânea...")
-        
-        st.markdown("</div>", unsafe_allow_html=True)
+            with col_b:
+                st.warning(f"💋 HACKER DIZ: {resp_h}")
+                # Gerar Voz Sexy (Pitch normal/agudo)
+                tts = gTTS(resp_h, lang='pt', tld='com.pt')
+                tts.save("hacker.mp3")
+                st.audio("hacker.mp3")
+
+    st.markdown("</div>", unsafe_allow_html=True)
 
 if __name__ == "__main__":
     main()
