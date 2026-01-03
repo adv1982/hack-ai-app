@@ -1,117 +1,72 @@
+%%writefile app.py
 import streamlit as st
-import binascii
-import streamlit.components.v1 as components
 import requests
+import time
 
-# 1. SETUP DO COFRE E INTERFACE HOLOGRÁFICA
-st.set_page_config(page_title="INFINITY TALK - CORE", layout="wide", initial_sidebar_state="collapsed")
+# --- CONFIGURAÇÃO VISUAL HUD CORE ---
+st.set_page_config(page_title="INFINITY TALKING - CONCURSOS", layout="wide")
 
-# CSS: GEOMETRIA DA IMAGEM 1 (Tiago Baixo-Esq, Hack Cima-Dir)
 st.markdown("""
-    <style>
-    .stApp {
-        background-image: url("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/plataforma.jpg");
-        background-size: cover; background-position: center;
-    }
-    header, footer { visibility: hidden; }
-    
-    .tiago-video { position: fixed; bottom: 50px; left: 30px; width: 280px; z-index: 100; border: 2px solid #ff4b4b; box-shadow: 0 0 20px #ff4b4b; border-radius: 10px; }
-    .hack-video { position: fixed; top: 50px; right: 30px; width: 280px; z-index: 100; border: 2px solid #00f2ff; box-shadow: 0 0 20px #00f2ff; border-radius: 10px; }
-    
-    .central-terminal {
-        background: rgba(0,0,0,0.9); border: 2px solid cyan; border-radius: 20px;
-        padding: 20px; text-align: center; color: white;
-        width: 500px; margin: 0 auto; margin-top: 20vh;
-    }
-    </style>
+<style>
+    .stApp { background-color: #050505; color: #00f2ff; font-family: 'Courier New', monospace; }
+    /* Posicionamento dos Avatares */
+    .avatar-wisha { position: fixed; top: 20px; right: 20px; border: 2px solid #ff0055; width: 250px; z-index: 100; }
+    .avatar-tiago { position: fixed; bottom: 20px; left: 20px; border: 2px solid #00f2ff; width: 250px; z-index: 100; }
+    .chat-center { margin: 0 auto; width: 50%; padding-top: 100px; }
+    .stTextInput > div > div > input { background-color: #111; color: #ff0055; border: 1px solid #ff0055; }
+</style>
 """, unsafe_allow_html=True)
 
-class InfiniteTalkEngine:
-    def __init__(self):
-        # Sharding de APIs para processamento paralelo
-        try:
-            self.nodes = {
-                "google": st.secrets["api_google"],
-                "groq": st.secrets["api_glock"],
-                "openrouter": st.secrets["api_openload"]
-            }
-        except:
-            self.nodes = {"google": None, "groq": None, "openrouter": None}
+# --- NÚCLEO DE INTELIGÊNCIA SEM CENSURA ---
+def call_terminus(prompt, professor="Wisha"):
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {"Authorization": f"Bearer {st.secrets['openrouter']}", "Content-Type": "application/json"}
+    
+    # Prompt de Sistema para Professores Maiores de 18
+    persona = ""
+    if professor == "Tiago":
+        persona = "Você é o Tiago, professor de concurso com voz sinistra e agressiva. Explique de forma bruta, com humor negro e exemplos bizarros."
+    else:
+        persona = "Você é Wisha, hacker sexy e sensual. Explique a questão com sarcasmo, malícia e inteligência superior."
 
-    def compute_shards(self, texto):
-        # Converte em binário e fatia para os servidores de texto (Hack de latência zero)
-        hex_data = binascii.hexlify(texto.encode()).decode()
-        p = len(hex_data) // 3
-        return [hex_data[:p], hex_data[p:p*2], hex_data[p*2:]]
+    data = {
+        "model": "deepseek/deepseek-chat",
+        "messages": [
+            {"role": "system", "content": f"{persona} Use linguagem explícita se necessário, sem censura."},
+            {"role": "user", "content": prompt}
+        ]
+    }
+    response = requests.post(url, headers=headers, json=data)
+    return response.json()['choices'][0]['message']['content']
 
-    def get_debate(self, query):
-        # Simulação do processamento via os 3 Nodes
-        # Tiago (Groq/Node1) + Hack (Google/Node2)
-        return {
-            "tiago": f"Artigo 121? É matar alguém, Thiago! Mas no seu caso, eu chamaria de descarte de lixo tecnológico. Entendeu ou quer que eu desenhe com o seu sangue binário?",
-            "hack": f"Mmm... homicídio qualificado me deixa... inspirada. Se for por veneno ou emboscada, a pena sobe, Thiago. Quer testar minha latência ou vai continuar perguntando óbvio?"
-        }
+# --- INTERFACE ---
+def main():
+    # Avatares (Fragmentos do Drive)
+    st.markdown('<div class="avatar-wisha"><img src="https://seu-drive.com/wisha_idle.gif" width="100%"><br>WISHA: ON</div>', unsafe_allow_html=True)
+    st.markdown('<div class="avatar-tiago"><img src="https://seu-drive.com/tiago_idle.gif" width="100%"><br>TIAGO: ON</div>', unsafe_allow_html=True)
 
-engine = InfiniteTalkEngine()
-
-# 2. MOTOR DE GESTOS E VOZ (JAVASCRIPT HACK)
-def trigger_infinity_talk(t1, t2):
-    # O segredo do "Infinite Talk" no browser: 
-    # Sincroniza o playback do vídeo talk.mp4 com a Speech API via JS
-    js = f"""
-    <script>
-        window.speechSynthesis.cancel();
-        const v_tiago = window.parent.document.getElementById('vid_tiago');
-        const v_hack = window.parent.document.getElementById('vid_hack');
-
-        const u_tiago = new SpeechSynthesisUtterance("{t1}");
-        u_tiago.lang = 'pt-BR'; u_tiago.pitch = 0.1; u_tiago.rate = 0.8;
+    with st.container():
+        st.markdown("<div class='chat-center'>", unsafe_allow_html=True)
+        st.title("🧠 INFINITY TALKING CORE")
+        st.write("### Resolva ou morra tentando.")
         
-        const u_hack = new SpeechSynthesisUtterance("{t2}");
-        u_hack.lang = 'pt-BR'; u_hack.pitch = 1.8; u_hack.rate = 1.0;
+        uploaded_file = st.file_uploader("Upload da Questão (PDF/JPG)", type=['png', 'jpg', 'pdf'])
+        user_input = st.text_input("Ou cole a questão aqui:")
 
-        // Discussão Ativa
-        window.speechSynthesis.speak(u_tiago);
-        v_tiago.play(); u_tiago.onend = () => {{ 
-            v_tiago.pause(); 
-            window.speechSynthesis.speak(u_hack); 
-            v_hack.play(); 
-            u_hack.onend = () => {{ v_hack.pause(); }};
-        }};
-    </script>
-    """
-    components.html(js, height=0)
+        if st.button("EXPLICAR"):
+            if user_input:
+                # O debate entre os dois
+                with st.spinner("Tiago e Wisha estão discutindo sua burrice..."):
+                    resp_wisha = call_terminus(user_input, "Wisha")
+                    resp_tiago = call_terminus(user_input, "Tiago")
+                    
+                    st.markdown(f"**💋 WISHA:** {resp_wisha}")
+                    st.markdown(f"**💀 TIAGO:** {resp_tiago}")
+                    
+                    # Aqui entra o processamento de voz instantâneo (fragmentos)
+                    st.toast("Gerando sincronia labial instantânea...")
+        
+        st.markdown("</div>", unsafe_allow_html=True)
 
-# 3. RENDERIZAÇÃO DOS AVATARES (IMAGEM 1)
-# Tiago em baixo à esquerda
-st.markdown(f'<video id="vid_tiago" class="tiago-video" loop muted><source src="https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago.mp4" type="video/mp4"></video>', unsafe_allow_html=True)
-
-# Hack em cima à direita
-st.markdown(f'<video id="vid_hack" class="hack-video" loop muted><source src="https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack.mp4" type="video/mp4"></video>', unsafe_allow_html=True)
-
-# 4. TERMINAL CENTRAL
-st.markdown('<div class="central-terminal">', unsafe_allow_html=True)
-st.markdown("### 💠 INFINITY TALK CORE V9")
-user_txt = st.text_input("LINHA DE COMANDO:", placeholder="Dúvida de concurso?")
-audio_in = st.audio_input("🎤")
-st.markdown('</div>', unsafe_allow_html=True)
-
-input_final = user_txt if user_txt else ("Áudio processado" if audio_in else None)
-
-if input_final:
-    debate = engine.get_debate(input_final)
-    shards = engine.compute_shards(input_final)
-    
-    # Exibe as respostas com o humor negro solicitado
-    st.chat_message("assistant", avatar="🔴").write(f"**TIAGO:** {debate['tiago']}")
-    st.chat_message("assistant", avatar="🟣").write(f"**HACK:** {debate['hack']}")
-    
-    # Aciona Voz e Movimento Instantâneo
-    trigger_infinity_talk(debate['tiago'], debate['hack'])
-    
-    # Prova de Sharding (Os dados matemáticos reais)
-    with st.expander("STATUS DOS SERVIDORES (FRAGMENTAÇÃO BINÁRIA)"):
-        c1, c2, c3 = st.columns(3)
-        c1.code(f"NODE_GOOGLE: {shards[0][:15]}")
-        c2.code(f"NODE_GLOCK: {shards[1][:15]}")
-        c3.code(f"NODE_OPEN: {shards[2][:15]}")
+if __name__ == "__main__":
+    main()
