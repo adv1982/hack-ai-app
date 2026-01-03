@@ -1,0 +1,7 @@
+streamlit
+openai
+groq
+google-generativeai
+python-dotenv
+requests
+numpy
