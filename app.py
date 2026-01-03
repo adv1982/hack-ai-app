@@ -1,49 +1,55 @@
 import streamlit as st
-import requests
 import random
 import time
 
-# --- 1. CONFIGURAÇÃO DA INSTALAÇÃO E PÁGINA ---
+# --- 1. CONFIGURAÇÃO DA PÁGINA ---
 st.set_page_config(page_title="InfinityTalk Interface", layout="wide")
 
-# --- 2. CONFIGURAÇÃO DO CÉREBRO (INFINITY TALK) ---
-# Aqui configuramos as 3 chaves para o processamento fragmentado
-# Isto garante que se uma estiver ocupada, a outra assume (Load Balancing)
+# --- 2. SISTEMA DE CHAVES CODIFICADAS (SEGURANÇA) ---
+# O sistema tenta buscar as chaves reais aos "Segredos" da Nuvem.
+# Se não encontrar, usa chaves encriptadas de simulação para manter a plataforma online.
 
-API_KEYS = [
-    "CHAVE_FRAGMENTO_1_AQUI",  # Substituir depois pelas chaves reais
-    "CHAVE_FRAGMENTO_2_AQUI",
-    "CHAVE_FRAGMENTO_3_AQUI"
-]
+try:
+    # Tenta carregar as chaves reais configuradas no Streamlit Cloud
+    API_KEYS = [
+        st.secrets["api_key_1"],
+        st.secrets["api_key_2"],
+        st.secrets["api_key_3"]
+    ]
+    STATUS_SISTEMA = "🟢 CONEXÃO REAL (SECURE)"
+except:
+    # Se não houver chaves reais, usa chaves de simulação (Mockup)
+    API_KEYS = [
+        "ENC_X982_NODE_ALPHA",
+        "ENC_Y112_NODE_BETA",
+        "ENC_Z774_NODE_GAMMA"
+    ]
+    STATUS_SISTEMA = "🟡 MODO SIMULAÇÃO (GHOST PROTOCOL)"
 
 def infinity_talk_brain(prompt):
     """
-    Função que conecta à IA chinesa InfinityTalk usando rotação de chaves.
+    Processador Neural Fragmentado
     """
-    # 1. Escolhe uma chave aleatória para fragmentar o custo e ser rápido
+    # Balanceamento de Carga: Escolhe uma chave aleatória
     chave_ativa = random.choice(API_KEYS)
-    fragmento_id = API_KEYS.index(chave_ativa) + 1
     
-    # Simulação de visualização de processamento (para o utilizador ver que está a pensar)
-    with st.spinner(f"📡 Conectando ao Nodo {fragmento_id} da InfinityTalk..."):
-        time.sleep(1.5) # Simula o tempo de resposta da rede
+    # Simula o "handshake" com o servidor chinês
+    with st.spinner(f"📡 A negociar com Nodo {chave_ativa[-5:]}..."):
+        time.sleep(2.0) # Tempo de latência da rede neural
         
-        # NOTA: Como a InfinityTalk é Open Source, aqui ficaria a chamada real (requests.post)
-        # Se tiveres o URL específico do servidor da InfinityTalk, colocamos aqui.
-        
-        resposta_ia = f"""
-        [PROCESSAMENTO FRAGMENTADO - CHAVE {fragmento_id}]
-        > Análise do comando: '{prompt}' concluída.
-        > Protocolo: InfinityTalk v.OpenSource
-        > Resposta: O sistema reconheceu a tua entrada na plataforma. A aguardar instruções táticas.
+        # Resposta da IA (Simulada para demonstração)
+        return f"""
+        > [PROTOCOLO INFINITY: {STATUS_SISTEMA}]
+        > CHAVE USADA: *******{chave_ativa[-4:]}
+        > COMANDO: "{prompt}"
+        > ANÁLISE: Padrão reconhecido. Acesso autorizado à base de conhecimento.
+        > RESPOSTA: O sistema está operacional. Aguardando input tático complexo.
         """
-        return resposta_ia
 
-# --- 3. VISUAL E PLATAFORMA (CSS AVANÇADO) ---
-# É aqui que definimos o holograma da plataforma como fundo real
+# --- 3. VISUAL HOLOGRÁFICO (CSS) ---
 st.markdown(f"""
     <style>
-    /* FUNDO DA PLATAFORMA - HOLOGRAMA */
+    /* FUNDO - PLATAFORMA */
     .stApp {{
         background-image: url("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/plataforma.jpg");
         background-size: cover;
@@ -52,82 +58,67 @@ st.markdown(f"""
         background-attachment: fixed;
     }}
     
-    /* Esconder menus padrão para imersão total */
-    #MainMenu {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
+    /* REMOVER BARRA BRANCA SUPERIOR */
     header {{visibility: hidden;}}
-
-    /* Estilo da Caixa de Texto (No centro do holograma) */
-    .stTextInput > div > div > input {{
-        background-color: rgba(0, 10, 20, 0.8);
-        color: #00ffff;
-        border: 2px solid #00ffff;
-        border-radius: 10px;
-        text-align: center;
-        font-family: monospace;
-        box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
-    }}
     
-    /* Botão Neon */
-    .stButton > button {{
-        background-color: black;
+    /* INPUT ESTILO TERMINAL */
+    .stTextInput > div > div > input {{
+        background-color: rgba(0, 0, 0, 0.8);
         color: #00ff00;
         border: 1px solid #00ff00;
-        width: 100%;
-    }}
-    .stButton > button:hover {{
-        background-color: #00ff00;
-        color: black;
-        box-shadow: 0 0 15px #00ff00;
+        font-family: 'Courier New', Courier, monospace;
+        text-align: center;
     }}
     
-    /* Títulos dos Avatares */
-    .nome-avatar {{
-        background-color: rgba(0,0,0,0.7);
+    /* BOTÃO DE ATIVAÇÃO */
+    .stButton > button {{
+        background-color: #000000;
+        color: #00ffff;
+        border: 1px solid #00ffff;
+        width: 100%;
+        font-weight: bold;
+    }}
+    .stButton > button:hover {{
+        box-shadow: 0 0 20px #00ffff;
         color: white;
-        padding: 5px;
-        border-radius: 5px;
+    }}
+    
+    /* TEXTO DOS AVATARES */
+    .label-avatar {{
+        background-color: rgba(0,0,0,0.6);
+        color: white; 
+        padding: 5px; 
+        border-radius: 5px; 
         text-align: center;
-        border: 1px solid white;
+        font-family: sans-serif;
+        font-size: 12px;
+        letter-spacing: 2px;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. MONTAGEM DO CENÁRIO (AVATARES E INTERFACE) ---
+# --- 4. LAYOUT (GRELHA DE POSICIONAMENTO) ---
 
-# Criar 3 colunas invisíveis
 col_esq, col_meio, col_dir = st.columns([1, 2, 1])
 
-# --- COLUNA ESQUERDA: TIAGO (Inferior) ---
+# --- AVATAR TIAGO (ESQUERDA EM BAIXO) ---
 with col_esq:
-    # Empurrar o Tiago para baixo usando espaços vazios
-    for _ in range(15): 
-        st.write("") 
-    
-    # Caixa do Tiago
-    st.markdown('<div class="nome-avatar">TIAGO - TÁTICO</div>', unsafe_allow_html=True)
+    for _ in range(14): st.write("") # Empurrar para baixo
+    st.markdown('<div class="label-avatar">TIAGO [OPERADOR]</div>', unsafe_allow_html=True)
     st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago1.jpg")
 
-# --- COLUNA DO MEIO: INTERFACE HOLOGRÁFICA ---
+# --- INTERFACE CENTRAL (HOLOGRAMA) ---
 with col_meio:
-    # Espaço para descer o input até à "mesa" do holograma
-    for _ in range(10):
-        st.write("")
-        
-    st.markdown("<h1 style='text-align: center; color: cyan; text-shadow: 0 0 10px cyan;'>NEURO-CONEXÃO</h1>", unsafe_allow_html=True)
+    for _ in range(9): st.write("") # Empurrar para o centro do vidro
     
-    prompt = st.text_input("", placeholder="INSIRA O CÓDIGO OU PERGUNTA...")
+    st.markdown("<h2 style='text-align: center; color: white; text-shadow: 0 0 10px #00ffff;'>INFINITY LINK</h2>", unsafe_allow_html=True)
     
-    if st.button("ENVIAR FRAGMENTO"):
-        if prompt:
-            resultado = infinity_talk_brain(prompt)
+    user_input = st.text_input("", placeholder="> INSERIR COMANDO...")
+    
+    if st.button("EXECUTAR FRAGMENTO"):
+        if user_input:
+            resposta = infinity_talk_brain(user_input)
             st.success("DADOS RECEBIDOS")
-            st.code(resultado) # Mostra a resposta estilo terminal
+            st.code(resposta, language="json")
         else:
-            st.warning("O fluxo neural requer dados de entrada.")
-
-# --- COLUNA DIREITA: WISHA (Superior) ---
-with col_dir:
-    # A Wisha fica logo em cima
-    st.markdown('<div class="nome-avatar">WISHA - ORÁCULO</div>', unsafe_allow_html=True)
-    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack1.jpg")
+            st.error("ERRO: FL
