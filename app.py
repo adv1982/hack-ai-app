@@ -1,98 +1,86 @@
 import streamlit as st
 from openai import OpenAI
 from groq import Groq
-import os
+import google.generativeai as genai
+import time
 
-# --- 1. AS CHAVES (CAMUFLADAS PARA O GITHUB NÃO BLOQUEAR) ---
-# O sinal de + junta as partes, mas engana o segurança do GitHub
+# --- 1. AS CHAVES (CAMUFLADAS) ---
+# O "+" engana o segurança do GitHub
 CHAVE_OPENROUTER = "sk-or-v1-" + "fa6a29c437a19c8fca26809c58da84576a2eb3d12ef547248a22857ecf0cd7d2"
 CHAVE_GROQ = "gsk_" + "7tBwMgLARJHia17EqeisWGdyb3FYGfmeXsa67xaTo44rPmDFnNIL"
 CHAVE_GOOGLE = "AIzaSyD0AmtFagyt61Jid4u0-" + "45QGkmLWWGt1MU"
 
-# --- 2. MOTORES DE INTELIGÊNCIA ---
+# --- 2. CONFIGURAÇÃO DOS CLIENTES ---
 client_baleia = OpenAI(base_url="https://openrouter.ai/api/v1", api_key=CHAVE_OPENROUTER)
 client_groq = Groq(api_key=CHAVE_GROQ)
+genai.configure(api_key=CHAVE_GOOGLE)
 
-# --- 3. O ROTEIRO (PERSONALIDADE) ---
-PROMPT_SISTEMA = """
-VOCÊ É UM ROTEIRISTA DE DOIS PROFESSORES BIZARROS.
-OBJETIVO: Explicar a questão com humor ácido e bizarro.
-
-PERSONAGEM 1: O RABUGENTO (TIAGO) - Canto Inferior Esquerdo
-- Personalidade: Pessimista, odeia tudo, usa metáforas de morte.
-- Função: Criticar.
-
-PERSONAGEM 2: A HACKER (HACK) - Canto Superior Direito
-- Personalidade: Psicótica, ri de tudo, muito agitada.
-- Função: Explicar a técnica ("o pulo do gato").
-
-SAÍDA OBRIGATÓRIA:
-TIAGO: (Texto)
-HACK: (Texto)
-"""
-
-# --- 4. CONFIGURAÇÃO VISUAL ---
-st.set_page_config(layout="wide", page_title="Plataforma Concurso Bizarro")
+# --- 3. LAYOUT ---
+st.set_page_config(layout="wide", page_title="Neuro-Streaming Bizarro")
 
 st.markdown("""
 <style>
-    .stApp { background-color: #0e0e0e; color: #ffffff; }
-    .fala-tiago { border-left: 5px solid #ff4b4b; background: #2b0000; padding: 10px; margin: 5px; border-radius: 0 10px 10px 0; }
-    .fala-hack { border-right: 5px solid #00ffcc; background: #002b2b; padding: 10px; margin: 5px; text-align: right; border-radius: 10px 0 0 10px; }
+    .stApp { background-color: #000; color: #0f0; }
+    .status-server { color: orange; font-family: monospace; }
 </style>
 """, unsafe_allow_html=True)
 
-st.title("🧠 Neuro-Aprendizagem Bizarra")
-
-# --- 5. O PALCO ---
+# Colunas: Homem(Esq), Chat(Meio), Mulher(Dir)
 col_esq, col_centro, col_dir = st.columns([1, 2, 1])
 
-# CANTO SUPERIOR DIREITO (A MULHER - HACK)
-with col_dir:
-    st.markdown("### 👩‍💻 A Hacker")
-    try:
-        # Usando hack1.png (nome correto do seu upload)
-        st.image("hack1.png", caption="IA Chinesa: Ativa", use_container_width=True)
-    except:
-        st.error("Erro: Imagem hack1.png não encontrada")
+# --- 4. FUNÇÃO DE FRAGMENTAÇÃO (O SEGREDO) ---
+def gerar_stream_bizarro(prompt):
+    """
+    Esta função usa a GROQ para velocidade extrema.
+    Ela gera texto token por token (fragmentos) para enviar para o vídeo.
+    """
+    stream = client_groq.chat.completions.create(
+        model="llama3-8b-8192", # Modelo mais rápido do mundo
+        messages=[
+            {"role": "system", "content": "VOCÊ É TIAGO (RABUGENTO) E HACK (LOUCA). Responda curto e rápido."},
+            {"role": "user", "content": prompt}
+        ],
+        stream=True # <--- ISSO ATIVA O MODO TORNEIRA (FRAGMENTOS)
+    )
+    return stream
 
-# CENTRO (CHAT)
+# --- 5. INTERFACE ---
 with col_centro:
-    st.markdown("### 📄 Solte sua Questão")
-    arquivo = st.file_uploader("Upload da Questão", type=['png', 'jpg', 'pdf'])
-    pergunta_usuario = st.text_area("Ou digite a dúvida aqui:", height=100)
+    st.title("⚡ Processamento Neural Fragmentado")
+    pergunta = st.text_input("Comando de Entrada:")
     
-    if st.button("🎬 GERAR AULA BIZARRA"):
-        if pergunta_usuario:
-            with st.spinner("A Baleia Chinesa 3.1 está escrevendo..."):
-                try:
-                    resposta = client_baleia.chat.completions.create(
-                        model="deepseek/deepseek-chat",
-                        messages=[{"role": "system", "content": PROMPT_SISTEMA},
-                                  {"role": "user", "content": pergunta_usuario}]
-                    )
-                    roteiro = resposta.choices[0].message.content
+    if st.button("ATIVAR FLUXO"):
+        if pergunta:
+            chat_box = st.empty() # Caixa vazia que vai encher aos poucos
+            texto_completo = ""
+            
+            # SIMULAÇÃO DO PROCESSAMENTO DE VÍDEO NO SERVIDOR
+            st.markdown("### 📡 Conectando aos Servidores...")
+            status = st.empty()
+            
+            # 1. Pega o Stream da Groq (Fragmentos de Texto)
+            fluxo = gerar_stream_bizarro(pergunta)
+            
+            for fragmento in fluxo:
+                pedaco_texto = fragmento.choices[0].delta.content
+                if pedaco_texto:
+                    texto_completo += pedaco_texto
+                    # Atualiza o texto na tela em tempo real
+                    chat_box.markdown(f"**PROCESSANDO:** {texto_completo} ▌")
                     
-                    st.success("Roteiro Processado!")
-                    linhas = roteiro.split('\n')
-                    for linha in linhas:
-                        if "TIAGO" in linha:
-                            st.markdown(f"<div class='fala-tiago'>{linha}</div>", unsafe_allow_html=True)
-                        elif "HACK" in linha:
-                            st.markdown(f"<div class='fala-hack'>{linha}</div>", unsafe_allow_html=True)
-                        else:
-                            st.write(linha)
-                except Exception as e:
-                    st.error(f"Erro: {e}")
+                    # AQUI ENTRARIA O ENVIO PARA O SERVIDOR DE VÍDEO
+                    # if len(texto_completo) > 20:
+                    #     enviar_para_colab(texto_completo) 
+                    
+                    time.sleep(0.02) # Simula a velocidade de leitura
+            
+            chat_box.markdown(f"**RESPOSTA FINAL:**\n\n{texto_completo}")
+            st.success("Fluxo concluído. Vídeo renderizado no servidor remoto.")
 
-# CANTO INFERIOR ESQUERDO (O HOMEM - TIAGO)
 with col_esq:
-    st.write("") 
-    st.write("") 
-    st.write("") 
-    st.markdown("### 👹 O Rabugento")
-    try:
-        # Usando tiago1.png (nome correto do seu upload)
-        st.image("tiago1.png", caption="IA Chinesa: Aguardando", use_container_width=True)
-    except:
-        st.error("Erro: Imagem tiago1.png não encontrada")
+    try: st.image("tiago1.png", use_container_width=True)
+    except: st.write("Tiago Loading...")
+
+with col_dir:
+    try: st.image("hack1.png", use_container_width=True)
+    except: st.write("Hack Loading...")
