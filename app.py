@@ -2,53 +2,14 @@ import streamlit as st
 import random
 import time
 
-# --- 1. CONFIGURAÇÃO E INSTALAÇÃO DO SISTEMA ---
-st.set_page_config(page_title="InfinityTalk Neural Interface", layout="wide")
+# --- 1. CONFIGURAÇÃO OBRIGATÓRIA (PRIMEIRA LINHA) ---
+st.set_page_config(page_title="InfinityTalk Interface", layout="wide")
 
-# --- INSTALAÇÃO: CARREGAR CHAVES DO COFRE (SECRETS) ---
-# O sistema tenta conectar aos servidores usando as chaves que guardaste na nuvem.
-try:
-    KEYS_CLUSTER = [
-        st.secrets["api_key_1"],
-        st.secrets["api_key_2"],
-        st.secrets["api_key_3"]
-    ]
-    STATUS_CONEXAO = "ONLINE"
-except:
-    # Caso de emergência se as chaves não forem lidas
-    STATUS_CONEXAO = "OFFLINE"
-    KEYS_CLUSTER = ["MODO_SIMULACAO_ERRO"]
-
-# --- 2. CÉREBRO DA IA: INFINITY TALK (CHINA OPEN SOURCE) ---
-def infinity_talk_core(comando):
-    """
-    Esta função representa a instalação local do processamento da IA.
-    Ela recebe o comando, fragmenta e envia para a nuvem usando as chaves.
-    """
-    # Algoritmo de Fragmentação (Load Balancing)
-    # Escolhe uma das 3 chaves aleatoriamente para não sobrecarregar
-    chave_rota = random.choice(KEYS_CLUSTER)
-    
-    # Simulação de Latência de Rede Neural
-    with st.spinner(f"🔌 A conectar ao Nodo Chinês via {chave_rota[:10]}..."):
-        time.sleep(2.0) # Tempo de processamento
-        
-    # Retorno do Sistema
-    return f"""
-    [PROTOCOLO INFINITY-TALK: ATIVO]
-    --------------------------------
-    > ROTA UTILIZADA: {chave_rota}
-    > COMANDO DECODIFICADO: "{comando}"
-    > ANÁLISE: O sistema compreendeu a intenção.
-    > RESPOSTA DO ORÁCULO: Acesso autorizado. O padrão lógico foi confirmado.
-    > Aguardando próximo passo...
-    """
-
-# --- 3. INTERFACE VISUAL (O HOLOGRAMA) ---
-# Aqui configuramos para a tela preta sumir e entrar a tua imagem "plataforma.jpg"
+# --- 2. FORÇAR O VISUAL HOLOGRÁFICO (CSS AVANÇADO) ---
+# Este bloco obriga o navegador a substituir o fundo preto pela tua imagem
 st.markdown(f"""
     <style>
-    /* FORÇAR A IMAGEM DE FUNDO (PLATAFORMA) */
+    /* 1. FUNDO GERAL - APLICADO A TUDO */
     .stApp {{
         background-image: url("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/plataforma.jpg");
         background-size: cover;
@@ -56,85 +17,101 @@ st.markdown(f"""
         background-repeat: no-repeat;
         background-attachment: fixed;
     }}
-    
-    /* REMOVER BARRAS DO STREAMLIT */
+
+    /* 2. REMOVER O FUNDO PRETO PADRÃO DOS MENUS */
     header {{visibility: hidden;}}
-    footer {{visibility: hidden;}}
-    .stDeployButton {{display:none;}}
+    .css-1dp5vir {{background-image: none;}}
     
-    /* ESTILO DO INPUT (CAIXA DE TEXTO) */
+    /* 3. CAIXA DE TEXTO CENTRAL (ESTILO NEON) */
     .stTextInput > div > div > input {{
-        background-color: rgba(0, 0, 0, 0.7);
-        color: #00ff00;
-        border: 2px solid #00ff00;
+        background-color: rgba(0, 10, 20, 0.8);
+        color: cyan; 
+        border: 2px solid cyan;
         text-align: center;
-        font-family: 'Courier New', monospace;
         font-size: 20px;
-        box-shadow: 0 0 10px #00ff00;
+        border-radius: 10px;
+        box-shadow: 0 0 15px cyan;
     }}
-    
-    /* ESTILO DO BOTÃO */
+
+    /* 4. BOTÃO DE AÇÃO */
     .stButton > button {{
-        background-color: black;
-        color: #00ff00;
-        border: 1px solid #00ff00;
-        width: 100%;
+        background-color: #000000;
+        color: cyan;
+        border: 1px solid cyan;
         font-weight: bold;
+        text-transform: uppercase;
+        width: 100%;
+        transition: 0.3s;
     }}
     .stButton > button:hover {{
-        background-color: #00ff00;
+        background-color: cyan;
         color: black;
+        box-shadow: 0 0 20px cyan;
     }}
     
-    /* CAIXAS DOS NOMES */
-    .id-tag {{
-        background-color: rgba(0,0,0,0.8);
-        color: cyan;
+    /* 5. TAGS DOS NOMES (Tiago e Wisha) */
+    .name-tag {{
+        background-color: black;
+        color: #00ff00;
         padding: 5px;
         text-align: center;
-        border: 1px solid cyan;
-        font-family: sans-serif;
-        font-size: 12px;
+        border: 1px solid #00ff00;
+        font-family: monospace;
         margin-bottom: 5px;
+        font-weight: bold;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. POSICIONAMENTO DOS AVATARES E TELA ---
-# Criação das colunas invisíveis para organizar os elementos
+# --- 3. CONEXÃO COM O COFRE (SECRETS) ---
+try:
+    # Tenta ler as chaves reais que guardaste
+    chaves = [st.secrets["api_key_1"], st.secrets["api_key_2"], st.secrets["api_key_3"]]
+    sistema_status = "ONLINE"
+except:
+    # Se der erro, não quebra o site (Modo de Segurança)
+    chaves = ["DEMO_KEY_001"]
+    sistema_status = "MODO_DEMO"
 
-col1, col2, col3 = st.columns([1, 2, 1])
+# --- 4. CÉREBRO DA IA (INFINITY TALK) ---
+def processar_comando(comando):
+    chave_usada = random.choice(chaves)
+    # Simula o tempo de "pensar" da IA
+    with st.spinner(f"📡 A acessar servidor chinês via {chave_usada[:8]}..."):
+        time.sleep(2.5) 
+    
+    return f"""
+    >>> PROTOCOLO INFINITY: ATIVO
+    >>> ROTA SEGURA: {chave_usada}
+    >>> COMANDO: "{comando}"
+    >>> RESPOSTA: Acesso validado. O sistema aguarda instruções complexas.
+    """
 
-# --- COLUNA DA ESQUERDA (TIAGO - EM BAIXO) ---
-with col1:
-    # Espaçadores para empurrar o Tiago para baixo
-    for _ in range(12): st.write("") 
-    
-    st.markdown('<div class="id-tag">TIAGO [OPERADOR]</div>', unsafe_allow_html=True)
-    # Foto do Tiago
-    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago1.jpg", use_column_width=True)
+# --- 5. LAYOUT DA TELA (GRELHA) ---
 
-# --- COLUNA DO CENTRO (INTERFACE E CÓDIGO) ---
-with col2:
-    # Espaço para descer até a área do "vidro" do holograma
-    for _ in range(8): st.write("")
-    
-    st.markdown("<h2 style='text-align: center; color: white; text-shadow: 0 0 10px cyan;'>NEURO-INTERFACE v1.0</h2>", unsafe_allow_html=True)
-    
-    # Campo de entrada
-    user_input = st.text_input("", placeholder="> INSERIR CÓDIGO...")
-    
-    if st.button("ATIVAR FLUXO >>"):
-        if user_input and STATUS_CONEXAO == "ONLINE":
-            resposta = infinity_talk_core(user_input)
-            st.code(resposta, language="yaml")
-        elif STATUS_CONEXAO == "OFFLINE":
-            st.error("ERRO: CHAVES DE ACESSO NÃO ENCONTRADAS NO COFRE.")
-        else:
-            st.warning("AGUARDANDO COMANDO...")
+# Criamos 3 colunas para organizar: Esquerda (Tiago), Centro (Chat), Direita (Wisha)
+col_esq, col_centro, col_dir = st.columns([1, 3, 1])
 
-# --- COLUNA DA DIREITA (WISHA - EM CIMA) ---
-with col3:
-    st.markdown('<div class="id-tag">WISHA [ORÁCULO]</div>', unsafe_allow_html=True)
-    # Foto da Wisha
-    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack1.jpg", use_column_width=True)
+# COLUNA ESQUERDA: TIAGO
+with col_esq:
+    for _ in range(15): st.write("") # Empurra para baixo
+    st.markdown('<div class="name-tag">TIAGO [ADMIN]</div>', unsafe_allow_html=True)
+    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago1.jpg")
+
+# COLUNA CENTRAL: COMANDOS
+with col_centro:
+    for _ in range(10): st.write("") # Empurra para o centro do vidro do holograma
+    
+    st.markdown("<h2 style='text-align: center; color: white; text-shadow: 0 0 10px cyan;'>INFINITY TALK v2.0</h2>", unsafe_allow_html=True)
+    
+    comando = st.text_input("", placeholder="DIGITE O COMANDO AQUI...")
+    
+    if st.button("ENVIAR DADOS >>"):
+        if comando:
+            resultado = processar_comando(comando)
+            st.code(resultado, language="yaml")
+
+# COLUNA DIREITA: WISHA
+with col_dir:
+    st.markdown('<div class="name-tag">WISHA [IA]</div>', unsafe_allow_html=True)
+    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack1.jpg")
