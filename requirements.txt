@@ -3,3 +3,22 @@ requests
 google-generativeai
 groq
 numpy
+import os
+from google.colab import userdata
+
+# 1. Recuperar chaves criptografadas do cofre do Colab
+GROQ_KEY = userdata.get('groq')
+OPENROUTER_KEY = userdata.get('openrouter')
+GOOGLE_KEY = userdata.get('google')
+
+print("🔌 Conectando ao Núcleo Terminus 3.1...")
+
+# 2. Instalar dependências para processamento de áudio agressivo e vídeo instantâneo
+!pip install streamlit pyngrok gTTS pydub requests --quiet
+
+# 3. Preparar diretórios de fragmentos no Drive (5TB disponíveis)
+if not os.path.exists('/content/drive/MyDrive/INFINITY_TALKING'):
+    os.makedirs('/content/drive/MyDrive/INFINITY_TALKING/TIAGO_VOX')
+    os.makedirs('/content/drive/MyDrive/INFINITY_TALKING/WISHA_VOX')
+
+print("✅ Sistema Pronto. Iniciando Interface de Professores Bizarros.")
