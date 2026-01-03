@@ -2,54 +2,53 @@ import streamlit as st
 import random
 import time
 
-# --- 1. CONFIGURAÇÃO DA PÁGINA ---
-st.set_page_config(page_title="InfinityTalk Interface", layout="wide")
+# --- 1. CONFIGURAÇÃO E INSTALAÇÃO DO SISTEMA ---
+st.set_page_config(page_title="InfinityTalk Neural Interface", layout="wide")
 
-# --- 2. SISTEMA DE CHAVES CODIFICADAS (SEGURANÇA) ---
-# O sistema tenta buscar as chaves reais aos "Segredos" da Nuvem.
-# Se não encontrar, usa chaves encriptadas de simulação para manter a plataforma online.
-
+# --- INSTALAÇÃO: CARREGAR CHAVES DO COFRE (SECRETS) ---
+# O sistema tenta conectar aos servidores usando as chaves que guardaste na nuvem.
 try:
-    # Tenta carregar as chaves reais configuradas no Streamlit Cloud
-    API_KEYS = [
+    KEYS_CLUSTER = [
         st.secrets["api_key_1"],
         st.secrets["api_key_2"],
         st.secrets["api_key_3"]
     ]
-    STATUS_SISTEMA = "🟢 CONEXÃO REAL (SECURE)"
+    STATUS_CONEXAO = "ONLINE"
 except:
-    # Se não houver chaves reais, usa chaves de simulação (Mockup)
-    API_KEYS = [
-        "ENC_X982_NODE_ALPHA",
-        "ENC_Y112_NODE_BETA",
-        "ENC_Z774_NODE_GAMMA"
-    ]
-    STATUS_SISTEMA = "🟡 MODO SIMULAÇÃO (GHOST PROTOCOL)"
+    # Caso de emergência se as chaves não forem lidas
+    STATUS_CONEXAO = "OFFLINE"
+    KEYS_CLUSTER = ["MODO_SIMULACAO_ERRO"]
 
-def infinity_talk_brain(prompt):
+# --- 2. CÉREBRO DA IA: INFINITY TALK (CHINA OPEN SOURCE) ---
+def infinity_talk_core(comando):
     """
-    Processador Neural Fragmentado
+    Esta função representa a instalação local do processamento da IA.
+    Ela recebe o comando, fragmenta e envia para a nuvem usando as chaves.
     """
-    # Balanceamento de Carga: Escolhe uma chave aleatória
-    chave_ativa = random.choice(API_KEYS)
+    # Algoritmo de Fragmentação (Load Balancing)
+    # Escolhe uma das 3 chaves aleatoriamente para não sobrecarregar
+    chave_rota = random.choice(KEYS_CLUSTER)
     
-    # Simula o "handshake" com o servidor chinês
-    with st.spinner(f"📡 A negociar com Nodo {chave_ativa[-5:]}..."):
-        time.sleep(2.0) # Tempo de latência da rede neural
+    # Simulação de Latência de Rede Neural
+    with st.spinner(f"🔌 A conectar ao Nodo Chinês via {chave_rota[:10]}..."):
+        time.sleep(2.0) # Tempo de processamento
         
-        # Resposta da IA (Simulada para demonstração)
-        return f"""
-        > [PROTOCOLO INFINITY: {STATUS_SISTEMA}]
-        > CHAVE USADA: *******{chave_ativa[-4:]}
-        > COMANDO: "{prompt}"
-        > ANÁLISE: Padrão reconhecido. Acesso autorizado à base de conhecimento.
-        > RESPOSTA: O sistema está operacional. Aguardando input tático complexo.
-        """
+    # Retorno do Sistema
+    return f"""
+    [PROTOCOLO INFINITY-TALK: ATIVO]
+    --------------------------------
+    > ROTA UTILIZADA: {chave_rota}
+    > COMANDO DECODIFICADO: "{comando}"
+    > ANÁLISE: O sistema compreendeu a intenção.
+    > RESPOSTA DO ORÁCULO: Acesso autorizado. O padrão lógico foi confirmado.
+    > Aguardando próximo passo...
+    """
 
-# --- 3. VISUAL HOLOGRÁFICO (CSS) ---
+# --- 3. INTERFACE VISUAL (O HOLOGRAMA) ---
+# Aqui configuramos para a tela preta sumir e entrar a tua imagem "plataforma.jpg"
 st.markdown(f"""
     <style>
-    /* FUNDO - PLATAFORMA */
+    /* FORÇAR A IMAGEM DE FUNDO (PLATAFORMA) */
     .stApp {{
         background-image: url("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/plataforma.jpg");
         background-size: cover;
@@ -58,67 +57,84 @@ st.markdown(f"""
         background-attachment: fixed;
     }}
     
-    /* REMOVER BARRA BRANCA SUPERIOR */
+    /* REMOVER BARRAS DO STREAMLIT */
     header {{visibility: hidden;}}
+    footer {{visibility: hidden;}}
+    .stDeployButton {{display:none;}}
     
-    /* INPUT ESTILO TERMINAL */
+    /* ESTILO DO INPUT (CAIXA DE TEXTO) */
     .stTextInput > div > div > input {{
-        background-color: rgba(0, 0, 0, 0.8);
+        background-color: rgba(0, 0, 0, 0.7);
         color: #00ff00;
-        border: 1px solid #00ff00;
-        font-family: 'Courier New', Courier, monospace;
+        border: 2px solid #00ff00;
         text-align: center;
+        font-family: 'Courier New', monospace;
+        font-size: 20px;
+        box-shadow: 0 0 10px #00ff00;
     }}
     
-    /* BOTÃO DE ATIVAÇÃO */
+    /* ESTILO DO BOTÃO */
     .stButton > button {{
-        background-color: #000000;
-        color: #00ffff;
-        border: 1px solid #00ffff;
+        background-color: black;
+        color: #00ff00;
+        border: 1px solid #00ff00;
         width: 100%;
         font-weight: bold;
     }}
     .stButton > button:hover {{
-        box-shadow: 0 0 20px #00ffff;
-        color: white;
+        background-color: #00ff00;
+        color: black;
     }}
     
-    /* TEXTO DOS AVATARES */
-    .label-avatar {{
-        background-color: rgba(0,0,0,0.6);
-        color: white; 
-        padding: 5px; 
-        border-radius: 5px; 
+    /* CAIXAS DOS NOMES */
+    .id-tag {{
+        background-color: rgba(0,0,0,0.8);
+        color: cyan;
+        padding: 5px;
         text-align: center;
+        border: 1px solid cyan;
         font-family: sans-serif;
         font-size: 12px;
-        letter-spacing: 2px;
+        margin-bottom: 5px;
     }}
     </style>
 """, unsafe_allow_html=True)
 
-# --- 4. LAYOUT (GRELHA DE POSICIONAMENTO) ---
+# --- 4. POSICIONAMENTO DOS AVATARES E TELA ---
+# Criação das colunas invisíveis para organizar os elementos
 
-col_esq, col_meio, col_dir = st.columns([1, 2, 1])
+col1, col2, col3 = st.columns([1, 2, 1])
 
-# --- AVATAR TIAGO (ESQUERDA EM BAIXO) ---
-with col_esq:
-    for _ in range(14): st.write("") # Empurrar para baixo
-    st.markdown('<div class="label-avatar">TIAGO [OPERADOR]</div>', unsafe_allow_html=True)
-    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago1.jpg")
+# --- COLUNA DA ESQUERDA (TIAGO - EM BAIXO) ---
+with col1:
+    # Espaçadores para empurrar o Tiago para baixo
+    for _ in range(12): st.write("") 
+    
+    st.markdown('<div class="id-tag">TIAGO [OPERADOR]</div>', unsafe_allow_html=True)
+    # Foto do Tiago
+    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/tiago1.jpg", use_column_width=True)
 
-# --- INTERFACE CENTRAL (HOLOGRAMA) ---
-with col_meio:
-    for _ in range(9): st.write("") # Empurrar para o centro do vidro
+# --- COLUNA DO CENTRO (INTERFACE E CÓDIGO) ---
+with col2:
+    # Espaço para descer até a área do "vidro" do holograma
+    for _ in range(8): st.write("")
     
-    st.markdown("<h2 style='text-align: center; color: white; text-shadow: 0 0 10px #00ffff;'>INFINITY LINK</h2>", unsafe_allow_html=True)
+    st.markdown("<h2 style='text-align: center; color: white; text-shadow: 0 0 10px cyan;'>NEURO-INTERFACE v1.0</h2>", unsafe_allow_html=True)
     
-    user_input = st.text_input("", placeholder="> INSERIR COMANDO...")
+    # Campo de entrada
+    user_input = st.text_input("", placeholder="> INSERIR CÓDIGO...")
     
-    if st.button("EXECUTAR FRAGMENTO"):
-        if user_input:
-            resposta = infinity_talk_brain(user_input)
-            st.success("DADOS RECEBIDOS")
-            st.code(resposta, language="json")
+    if st.button("ATIVAR FLUXO >>"):
+        if user_input and STATUS_CONEXAO == "ONLINE":
+            resposta = infinity_talk_core(user_input)
+            st.code(resposta, language="yaml")
+        elif STATUS_CONEXAO == "OFFLINE":
+            st.error("ERRO: CHAVES DE ACESSO NÃO ENCONTRADAS NO COFRE.")
         else:
-            st.error("ERRO: FL
+            st.warning("AGUARDANDO COMANDO...")
+
+# --- COLUNA DA DIREITA (WISHA - EM CIMA) ---
+with col3:
+    st.markdown('<div class="id-tag">WISHA [ORÁCULO]</div>', unsafe_allow_html=True)
+    # Foto da Wisha
+    st.image("https://raw.githubusercontent.com/adv1982/hack-ai-app/main/hack1.jpg", use_column_width=True)
